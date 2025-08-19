@@ -74,3 +74,49 @@ export async function isAuthenticated(): Promise<boolean> {
     const token = await getSessionToken();
     return !!token;
 }
+
+export async function getToken(): Promise<string | null> {
+    return await getSessionToken();
+}
+
+
+export async function getUserInfo(): Promise<JWTPayload | null> {
+    const token = await getSessionToken();
+    if (!token) {
+        return null;
+    }
+
+    try {
+        const decoded: JWTPayload = jwtDecode<JWTPayload>(token);
+        return decoded;
+    } catch (error) {
+        console.error('Failed to decode token:', error);
+        return null;
+    }
+}
+
+
+export async function getAllUsers(): Promise<JWTPayload[] | null> {
+    const token = await getSessionToken();
+    if (!token) {
+        return null;
+    }
+
+    try {
+        const res = await fetch('http://localhost:8080/api/users', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error('Failed to fetch users');
+        }
+
+        const data = await res.json();
+        return data.data as JWTPayload[];
+    } catch (error) {
+        console.error('Failed to fetch users:', error);
+        return null;
+    }
+}
