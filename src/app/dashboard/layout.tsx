@@ -3,11 +3,14 @@ import LogoutButton from "@/app/dashboard/_components/LogoutButton";
 import {isAuthenticated} from "@/lib/actions";
 import {redirect} from "next/navigation";
 
+
 export default async function RootLayout({
                                        children,
                                    }: Readonly<{
     children: React.ReactNode;
 }>) {
+
+
 
     const authed = await isAuthenticated();
 
@@ -17,7 +20,7 @@ export default async function RootLayout({
 
 
     return (
-        <div>
+        <div className={"w-screen h-screen flex justify-center items-center bg-[#05070A] text-white"}>
             <div className="">
                 Dashboard Layout
             </div>
