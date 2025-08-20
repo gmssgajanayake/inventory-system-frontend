@@ -6,7 +6,7 @@ function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export  default async function LoginPage() {
+export default async function LoginPage() {
 
     const authed = await isAuthenticated();
     await delay(500);
@@ -15,9 +15,11 @@ export  default async function LoginPage() {
         redirect('/dashboard');
     }
 
-    return(
-            <div className={"w-screen h-screen flex justify-center items-center bg-[#05070A]"}>
-                <LoginForm />
-            </div>
-        );
+    return (
+
+        <div className={"w-screen h-screen flex justify-center items-center bg-[#05070A]"}>
+            < LoginForm/>
+        </div>
+
+    );
 }
