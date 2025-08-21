@@ -1,5 +1,4 @@
 import {getUserInfo} from "@/lib/actions";
-import AOSWrapper from "@/app/_components/AOSWrapper";
 
 
 function delay(ms: number) {

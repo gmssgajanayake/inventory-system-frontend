@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import LogoutButton from "@/app/dashboard/_components/LogoutButton";
+
 import {isAuthenticated} from "@/lib/actions";
 import {redirect} from "next/navigation";
 import {useState, useEffect} from "react";
 import {Menu, X} from "lucide-react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBoxesStacked, faUser, faUsers} from "@fortawesome/free-solid-svg-icons";
-import AOSWrapper from "@/app/_components/AOSWrapper";
+import LogoutButton from "@/app/dashboard/_components/LogoutButton";
 
 export default function RootLayout({
                                        children,
@@ -52,6 +52,9 @@ export default function RootLayout({
 
     if (authed === null) return null; // prevent flicker
 
+
+
+
     return (
         <div className="w-screen h-screen flex bg-[#05070A] text-white">
             <div
@@ -65,7 +68,7 @@ export default function RootLayout({
                 </p>
 
                 <nav className="flex flex-col h-full gap-2 px-4 mt-4">
-                    <Link
+                    <Link  onClick={() => setSidebarOpen(false)}
                         href="/dashboard"
                         className="text-gray-200 group px-3 flex gap-3 items-center py-2 rounded-xl transition text-lg font-medium hover:bg-gray-300/10"
                     >
@@ -75,7 +78,7 @@ export default function RootLayout({
                         />
                         Profile
                     </Link>
-                    <Link
+                    <Link  onClick={() => setSidebarOpen(false)}
                         href="/dashboard/inventory"
                         className="text-gray-200 group px-3 flex gap-3 items-center py-2 rounded-xl transition text-lg font-medium hover:bg-gray-300/10"
                     >
@@ -85,7 +88,7 @@ export default function RootLayout({
                         />
                         Inventory
                     </Link>
-                    <Link
+                    <Link  onClick={() => setSidebarOpen(false)}
                         href="/dashboard/user"
                         className="text-gray-200 group px-3 flex gap-3 items-center py-2 rounded-xl transition text-lg font-medium hover:bg-gray-300/10"
                     >
@@ -112,7 +115,7 @@ export default function RootLayout({
             <div className="flex-1 flex flex-col">
 
                 <header
-                    className="h-18 flex items-center py-4 md:py-0 justify-between px-6
+                    className="h-18 flex items-center  py-4 md:py-0 justify-between px-6
           bg-[#0A0E17]/70 backdrop-blur-lg border-b border-white/10 shadow-md"
                 >
                     <div className="flex items-center gap-4">
@@ -126,12 +129,10 @@ export default function RootLayout({
                         <p className="text-xl font-semibold text-amber-50">Dashboard</p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <span className="text-sm text-gray-300">Welcome, Admin</span>
+                        <span className="text-sm text-gray-300">Welcome, Staff</span>
                     </div>
                 </header>
 
-
-                <AOSWrapper>
                     <div data-aos="zoom-in" className="w-full h-full rounded-lg p-4">
                         <div
                             className="w-full h-full rounded-lg bg-gradient-to-r from-pink-500 via-purple-600 to-blue-600 p-[1px] shadow-2xl shadow-purple-500/30">
@@ -144,8 +145,6 @@ export default function RootLayout({
                             </div>
                         </div>
                     </div>
-                </AOSWrapper>
-
             </div>
         </div>
     );

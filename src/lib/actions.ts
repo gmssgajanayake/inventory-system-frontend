@@ -120,3 +120,241 @@ export async function getAllUsers(): Promise<JWTPayload[] | null> {
         return null;
     }
 }
+
+export async function addUser(prevState: string | undefined, formData: FormData) {
+
+
+
+    const token = await getSessionToken();
+    if (!token) {
+        return null;
+    }
+
+
+
+    try {
+        const username = formData.get('username');
+        const password = formData.get('password');
+        const role = formData.get('role');
+
+
+        console.log(`Adding user with username: ${username}, role: ${role}, password: ${password}`);
+
+        const res = await fetch('http://localhost:8080/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({username, password,role}),
+
+        });
+
+        console.log(res)
+
+        return res.ok;
+
+    } catch (error) {
+        if (error instanceof Error) {
+            return error.message;
+        }
+        return 'Can\'t register user at this time.';
+    }
+
+}
+
+export async function deleteUser(id: number): Promise<{ success: boolean; message?: string }> {
+
+
+    console.log("ewdewd")
+
+    const token = await getSessionToken();
+    if (!token) {
+        return { success: false, message: 'Not authenticated' };
+    }
+
+    try {
+        const res = await fetch(`http://localhost:8080/api/users/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error('Failed to delete user');
+        }
+
+        return { success: true, message: 'User deleted successfully' };
+    } catch (error) {
+        console.error('Failed to delete user:', error);
+        return { success: false, message: error instanceof Error ? error.message : 'An unknown error occurred.' };
+    }
+}
+
+export async function updateUser(prevState: string | undefined, formData: FormData) {
+
+    const token = await getSessionToken();
+    if (!token) {
+        return null;
+    }
+
+    try {
+        const id = formData.get('id');
+        const username = formData.get('username');
+        const password = formData.get('password');
+        const role = formData.get('role');
+
+        console.log(`Updating user with ID: ${id}, username: ${username}, role: ${role}`);
+
+        const res = await fetch(`http://localhost:8080/api/users/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({username, password, role}),
+        });
+
+        return res.ok;
+
+    } catch (error) {
+        if (error instanceof Error) {
+            return error.message;
+        }
+        return 'Can\'t update user at this time.';
+    }
+}
+
+export async function getAllItems(): Promise<JWTPayload[] | null> {
+    const token = await getSessionToken();
+    if (!token) {
+        return null;
+    }
+
+    try {
+        const res = await fetch('http://localhost:8080/api/items');
+
+        if (!res.ok) {
+            throw new Error('Failed to fetch users');
+        }
+
+        const data = await res.json();
+        return data.data as JWTPayload[];
+    } catch (error) {
+        console.error('Failed to fetch users:', error);
+        return null;
+    }
+}
+
+// In lib/actions.ts
+export async function updateItems(prevState: string | undefined, formData: FormData) {
+
+
+
+    const token = await getSessionToken();
+    if (!token) {
+        return { success: false, message: 'Not authenticated' };
+    }
+
+    try {
+        const id = formData.get('id');
+        const name = formData.get('name');
+        const description = formData.get('description');
+        const quantity = formData.get('quantity');
+        const price = formData.get('price');
+
+        const res = await fetch(`http://localhost:8080/api/items/${id}`, {
+            method: 'PUT',
+            // ... (headers and body)
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json();
+            return { success: false, message: errorData.message || 'Failed to update item.' };
+        }
+
+        return { success: true, message: 'Item updated successfully.' };
+
+    } catch (error) {
+        // ... (error handling)
+        return { success: false, message: 'An unknown error occurred.' };
+    }
+}
+
+
+
+export async function deleteItem(id: number): Promise<{ success: boolean; message?: string }> {
+
+    const token = await getSessionToken();
+    if (!token) {
+        return { success: false, message: 'Not authenticated' };
+    }
+
+    try {
+        const res = await fetch(`http://localhost:8080/api/items/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error('Failed to delete item');
+        }
+
+        return { success: true, message: 'Item deleted successfully' };
+    } catch (error) {
+        console.error('Failed to delete item:', error);
+        return { success: false, message: error instanceof Error ? error.message : 'An unknown error occurred.' };
+    }
+}
+
+
+// In lib/actions.ts
+
+export async function addItems(prevState: string | undefined, formData: FormData) {
+
+
+
+    const token = await getSessionToken();
+    if (!token) {
+        return { success: false, message: 'Not authenticated' };
+    }
+
+
+
+    try {
+        // Read the correct item fields from the form
+        const name = formData.get('name');
+        const description = formData.get('description');
+        const quantity = Number(formData.get('quantity'));
+        const price = Number(formData.get('price'));
+
+
+
+
+        console.log(JSON.stringify({ name, description, quantity, price }))
+
+        const res = await fetch('http://localhost:8080/api/items/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            // Send the correct item data
+            body: JSON.stringify({ name, description, quantity, price }),
+        });
+
+        console.log(res)
+
+        if (!res.ok) {
+            return { success: false, message: 'Failed to add item.' };
+        }
+
+        return { success: true, message: 'Item added successfully.' };
+
+    } catch (error) {
+        return { success: false, message: 'An unknown error occurred.' };
+    }
+}
