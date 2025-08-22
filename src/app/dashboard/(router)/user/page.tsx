@@ -1,6 +1,6 @@
 "use client";
 
-import { addUser, getAllUsers, updateUser, deleteUser } from "@/lib/actions";
+import {addUser, getAllUsers, updateUser, deleteUser, getUserInfo} from "@/lib/actions";
 import { useEffect, useState, useTransition } from "react";
 
 type UserType = {
@@ -11,27 +11,46 @@ type UserType = {
 
 export default function User() {
     const [users, setUsers] = useState<UserType[]>([]);
-    const [searchQuery, setSearchQuery] = useState<string>("");
 
-    // State to manage which user is being edited
     const [editingUser, setEditingUser] = useState<UserType | null>(null);
 
-    // Form state
+
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [role, setRole] = useState<UserType["role"]>("USER"); // ✅ default role USER
+    const [role, setRole] = useState<UserType["role"]>("USER");
 
-    // For handling pending states of server actions
+
+    const [curentUser,setCurrentUser]=useState<string>("");
+
+
     const [isPending, startTransition] = useTransition();
 
     // Fetch users initially
     useEffect(() => {
+        let isMounted = true;
+
         async function fetchUsers() {
-            const allUsers = await getAllUsers();
-            if (allUsers) setUsers(allUsers as UserType[]);
+            try {
+                const [allUsers, loginUser] = await Promise.all([
+                    getAllUsers(),
+                    getUserInfo(),
+                ]);
+
+                if (!isMounted) return;
+
+                setCurrentUser(loginUser?.username || "");
+                if (allUsers) setUsers(allUsers as UserType[]);
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            }
         }
+
         fetchUsers();
-    }, [searchQuery]);
+
+        return () => {
+            isMounted = false; // cleanup to avoid memory leak
+        };
+    }, []);
 
     // Edit user
     const handleEditClick = (user: UserType) => {
@@ -47,10 +66,9 @@ export default function User() {
         setEditingUser(null);
         setUsername("");
         setPassword("");
-        setRole("USER"); // ✅ reset role to USER
+        setRole("USER");
     };
 
-    // Submit handler
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData();
@@ -95,19 +113,19 @@ export default function User() {
     };
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">
+        <div className="p-4 md:p-6">
+            <h1 className="text-xl md:text-2xl font-bold mb-4">
                 {editingUser ? `Editing User: ${editingUser.username}` : "Add a New User"}
             </h1>
 
             {/* Form */}
             <form
                 onSubmit={handleSubmit}
-                className="w-full flex items-start gap-6 p-2 mb-8"
+                className="w-full flex flex-col md:flex-row flex-wrap items-stretch gap-4 md:gap-6 mb-8"
             >
                 <input type="hidden" name="id" value={editingUser?.id || ""} />
 
-                <div className="flex-1 rounded-2xl bg-gray-300/5 backdrop-blur-md border border-white/10 shadow-xl p-4">
+                <div className="flex-1 min-w-0 rounded-2xl bg-gray-300/5 backdrop-blur-md border border-white/10 shadow-xl p-3">
                     <input
                         name="username"
                         className="bg-transparent outline-none w-full"
@@ -115,22 +133,23 @@ export default function User() {
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
+                        disabled={!!editingUser}
                     />
                 </div>
 
-                <div className="flex-1 rounded-2xl bg-gray-300/5 backdrop-blur-md border border-white/10 shadow-xl p-4">
+                <div className={ `flex-1 min-w-0 rounded-2xl bg-gray-300/5 backdrop-blur-md border ${editingUser ? "hidden" : "block"} border-white/10 shadow-xl p-3`}>
                     <input
                         name="password"
                         type="password"
-                        className="bg-transparent outline-none w-full"
-                        placeholder={editingUser ? "New Password (optional)" : "Password"}
+                        className={`bg-transparent outline-none w-full `}
+                        placeholder={ "Password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required={!editingUser}
+                        disabled={!!editingUser}
                     />
                 </div>
 
-                <div className="flex-1 rounded-2xl bg-gray-300/5 backdrop-blur-md border border-white/10 shadow-xl p-4">
+                <div className="flex-1 min-w-0 rounded-2xl bg-gray-300/5 backdrop-blur-md border border-white/10 shadow-xl p-3">
                     <select
                         name="role"
                         className="bg-transparent outline-none w-full"
@@ -142,11 +161,11 @@ export default function User() {
                     </select>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap md:flex-nowrap w-full md:w-auto">
                     <button
                         type="submit"
                         disabled={isPending}
-                        className={`w-40 text-white px-4 py-4 rounded-xl cursor-pointer ${
+                        className={`flex-1 text-white px-4 py-3 rounded-xl cursor-pointer ${
                             isPending
                                 ? "bg-gray-500"
                                 : editingUser
@@ -160,7 +179,7 @@ export default function User() {
                         <button
                             type="button"
                             onClick={resetForm}
-                            className="w-28 bg-gray-600 hover:bg-gray-700 text-white px-4 py-4 rounded-xl"
+                            className="flex-1 md:flex-initial bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 rounded-xl"
                         >
                             Cancel
                         </button>
@@ -170,49 +189,85 @@ export default function User() {
 
             <hr className="my-6 border-gray-700" />
 
-            {/* Users Table */}
             <div>
-                <h2 className="text-xl font-bold mb-4">Existing Users</h2>
+                <h2 className="text-lg md:text-xl font-bold mb-4">Existing Users</h2>
 
                 {users.length > 0 ? (
-                    <div className="max-h-96 overflow-y-auto border rounded-lg">
-                        <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-800 text-white sticky top-0">
-                            <tr>
-                                <th className="p-3">ID</th>
-                                <th className="p-3">Username</th>
-                                <th className="p-3">Role</th>
-                                <th className="p-3 text-center">Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {users.map((u) => (
-                                <tr
-                                    key={u.id}
-                                    className="border-b border-gray-700 hover:bg-gray-900/50"
+                    <>
+                        <div className="block md:hidden space-y-4">
+                            {users.map((user) => (
+                                user.username!==username &&
+                                <div
+                                    key={user.id}
+                                    className="rounded-2xl bg-gray-300/5 backdrop-blur-md border border-white/10 shadow-xl p-4"
                                 >
-                                    <td className="p-3">{u.id}</td>
-                                    <td className="p-3">{u.username}</td>
-                                    <td className="p-3 capitalize">{u.role}</td>
-                                    <td className="p-3 flex justify-center gap-2">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="font-semibold text-lg ">{user.username}</h3>
+                                        <span className="text-sm text-gray-400">ID: {user.id}</span>
+                                    </div>
+                                    <div className="mb-3">
+                                        <span className="text-sm text-gray-400">Role:</span>
+                                        <span className="ml-2 capitalize">{user.role}</span>
+                                    </div>
+                                    <div className="flex justify-between gap-2">
                                         <button
-                                            onClick={() => handleEditClick(u)}
-                                            className="px-3 py-1 bg-yellow-500 text-black rounded hover:bg-yellow-600"
+                                            onClick={() => handleEditClick(user)}
+                                            className="flex-1 px-4 py-2 bg-yellow-500 text-black rounded-lg hover:bg-yellow-600"
                                         >
                                             Edit
                                         </button>
                                         <button
-                                            onClick={() => handleDeleteClick(u.id)}
-                                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                            onClick={() => handleDeleteClick(user.id)}
+                                            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                                         >
                                             Delete
                                         </button>
-                                    </td>
-                                </tr>
+                                    </div>
+                                </div>
                             ))}
-                            </tbody>
-                        </table>
-                    </div>
+                        </div>
+
+                        {/* Desktop View - Table */}
+                        <div className="hidden md:block overflow-x-auto border rounded-lg">
+                            <table className="w-full min-w-[600px] text-left border-collapse">
+                                <thead className="bg-gray-800 text-white sticky top-0">
+                                <tr>
+                                    <th className="p-3">ID</th>
+                                    <th className="p-3">Username</th>
+                                    <th className="p-3">Role</th>
+                                    <th className="p-3 text-center">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {users.map((u) => (
+                                    u.username !== curentUser &&
+                                    <tr
+                                        key={u.id}
+                                        className="border-b border-gray-700 hover:bg-gray-900/50"
+                                    >
+                                        <td className="p-3">{u.id}</td>
+                                        <td className="p-3">{u.username}</td>
+                                        <td className="p-3 capitalize">{u.role}</td>
+                                        <td className="p-3 flex justify-center gap-2">
+                                            <button
+                                                onClick={() => handleEditClick(u)}
+                                                className="px-3 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-600"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteClick(u.id)}
+                                                className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
                 ) : (
                     <p>No users found.</p>
                 )}

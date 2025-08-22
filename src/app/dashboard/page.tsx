@@ -12,8 +12,6 @@ export default async function Dashboard() {
     const data = await getUserInfo();
 
 
-    console.log(data)
-
     return (
 
         <div>
@@ -36,19 +34,31 @@ export default async function Dashboard() {
                 </div>
 
             </div>
-
-            <div className="w-full flex flex-col gap-6 p-6 mt-6 ">
-                <h3 className={" font-extrabold text-gray-200"}>
-                    Admin Role Description :
-                </h3>
-                <p className={" font-extralight text-gray-200"}>
-
-
-                    As Admin, you have full control of the system—managing users, data, settings, and activities. Use
-                    this authority responsibly, as all changes you make are under your accountability
-                </p>
-            </div>
-
+            {
+                data?.role === "ADMIN" && (
+                    <div className="w-full flex flex-col gap-6 p-6 mt-6 bg-gray-300/5 backdrop-blur-md border border-white/10 shadow-xl rounded-2xl">
+                        <h3 className={" font-extrabold text-gray-200"}>
+                            Admin Role Description :
+                        </h3>
+                        <p className={" font-extralight text-gray-200"}>
+                            As Admin, you have full control of the system—managing users, data, settings, and activities.
+                            Use this authority responsibly, as all changes you make are under your accountability
+                        </p>
+                    </div>
+                )
+                ||
+                data?.role === "USER" && (
+                    <div className="w-full flex flex-col gap-6 p-6 mt-6 bg-gray-300/5 backdrop-blur-md border border-white/10 shadow-xl rounded-2xl">
+                        <h3 className={" font-extrabold text-gray-200"}>
+                            User Role Description :
+                        </h3>
+                        <p className={" font-extralight text-gray-200"}>
+                            As a User, you have access to view and manage your own data, but you cannot modify system-wide
+                            settings or manage other users. Your actions are limited to your own account.
+                        </p>
+                    </div>
+                )
+            }
         </div>
 
 
