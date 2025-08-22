@@ -23,7 +23,7 @@ export default function RootLayout({
 
     useEffect(() => {
         (async () => {
-            const result = await isUser(); // true = USER, false = ADMIN
+            const result = await isUser();
 
             if (result) {
                 setUserRole("USER");
@@ -72,7 +72,6 @@ export default function RootLayout({
 
     return (
         <div className="w-screen h-screen flex bg-[#05070A] text-white overflow-hidden">
-            {/* Sidebar */}
             <div
                 className={`fixed lg:static inset-y-0 left-0 z-40 w-64 h-full 
           bg-[#0A0E17]/95 lg:bg-[#0A0E17]/80 backdrop-blur-xl border-r border-white/10 

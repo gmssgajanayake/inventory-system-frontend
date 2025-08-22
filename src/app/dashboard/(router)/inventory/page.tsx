@@ -117,7 +117,7 @@ export default function Inventory() {
                 {editingItem ? `Editing Item: ${editingItem.name}` : "Add a New Item"}
             </h1>
 
-            {/* Form */}
+        
             <form
                 onSubmit={handleSubmit}
                 className="w-full flex flex-col md:flex-row flex-wrap items-stretch gap-4 md:gap-6 mb-8"
@@ -207,13 +207,13 @@ export default function Inventory() {
 
             <hr className="my-6 border-gray-700" />
 
-            {/* Items Display */}
+           
             <div>
                 <h2 className="text-lg md:text-xl font-bold mb-4">Existing Items</h2>
 
                 {items.length > 0 ? (
                     <>
-                        {/* Mobile View - Cards */}
+                       
                         <div className="block md:hidden space-y-4">
                             {items.map((item) => (
                                 <div
