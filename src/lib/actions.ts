@@ -83,6 +83,7 @@ export async function getToken(): Promise<string | null> {
 
 
 export async function getUserInfo(): Promise<JWTPayload | null> {
+
     const token = await getSessionToken();
     if (!token) {
         return null;

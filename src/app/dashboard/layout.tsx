@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBoxesStacked, faUser } from "@fortawesome/free-solid-svg-icons";
+import {faBoxesStacked, faUser, faUsers} from "@fortawesome/free-solid-svg-icons";
 import LogoutButton from "@/app/dashboard/_components/LogoutButton";
 
 export default function RootLayout({
@@ -116,7 +116,7 @@ export default function RootLayout({
                     >
                         <FontAwesomeIcon
                             className="bg-gray-300/10 p-2 text-blue-600 rounded-lg transition-colors duration-200 group-hover:bg-blue-600 group-hover:text-white w-4 h-4 lg:w-5 lg:h-5"
-                            icon={faBoxesStacked}
+                            icon={faUsers}
                         />
                         Users
                     </Link>

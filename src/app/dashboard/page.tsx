@@ -53,7 +53,7 @@ export default async function Dashboard() {
                             User Role Description :
                         </h3>
                         <p className={" font-extralight text-gray-200"}>
-                            As a User, you have access to view and manage your own data, but you cannot modify system-wide
+                            As a User, you have access to view and manage items, but you cannot modify system-wide
                             settings or manage other users. Your actions are limited to your own account.
                         </p>
                     </div>

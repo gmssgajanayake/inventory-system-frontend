@@ -1,6 +1,6 @@
 "use client";
 
-import { getAllItems, deleteItem, updateItems, addItems } from "@/lib/actions";
+import {getAllItems, deleteItem, updateItems, addItems, getUserInfo} from "@/lib/actions";
 import { useEffect, useState, useTransition } from "react";
 
 type ItemType = {
@@ -28,6 +28,8 @@ export default function Inventory() {
     const [price, setPrice] = useState<string>("");
 
     const [isPending, startTransition] = useTransition();
+    const [userRole, setUserRole] = useState<string>("");
+
 
     useEffect(() => {
         async function fetchItems() {
@@ -36,6 +38,19 @@ export default function Inventory() {
         }
         fetchItems();
     }, []);
+
+
+
+    useEffect(() => {
+        async function getCurrentLoginUserRole() {
+            const userInfo = await getUserInfo();
+            return userInfo?.role
+        }
+        getCurrentLoginUserRole().then((role) => {
+            setUserRole(role || "");
+        });
+    }, [userRole]);
+
 
     const handleEditClick = (item: ItemType) => {
         setEditingItem(item);
@@ -118,6 +133,7 @@ export default function Inventory() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
+                        disabled={userRole==="USER" && !!editingItem}
                     />
                 </div>
 
@@ -130,6 +146,7 @@ export default function Inventory() {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         required={!editingItem}
+                        disabled={userRole==="USER" && !!editingItem}
                     />
                 </div>
 
@@ -142,6 +159,7 @@ export default function Inventory() {
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         required={!editingItem}
+                        disabled={userRole==="USER" && !!editingItem}
                     />
                 </div>
 
@@ -226,7 +244,7 @@ export default function Inventory() {
                                         </button>
                                         <button
                                             onClick={() => handleDeleteClick(item.id)}
-                                            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                            className={`flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700`}
                                         >
                                             Delete
                                         </button>
@@ -266,12 +284,17 @@ export default function Inventory() {
                                             >
                                                 Edit
                                             </button>
-                                            <button
-                                                onClick={() => handleDeleteClick(u.id)}
-                                                className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                                            >
-                                                Delete
-                                            </button>
+
+                                            {
+                                                userRole === "ADMIN" && (
+                                                    <button
+                                                        onClick={() => handleDeleteClick(u.id)}
+                                                        className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                )
+                                            }
                                         </td>
                                     </tr>
                                 ))}
