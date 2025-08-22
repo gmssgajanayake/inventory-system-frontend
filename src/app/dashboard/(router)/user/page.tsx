@@ -25,7 +25,6 @@ export default function User() {
 
     const [isPending, startTransition] = useTransition();
 
-    // Fetch users initially
     useEffect(() => {
         let isMounted = true;
 
@@ -52,7 +51,7 @@ export default function User() {
         };
     }, []);
 
-    // Edit user
+
     const handleEditClick = (user: UserType) => {
         setEditingUser(user);
         setUsername(user.username);
@@ -61,7 +60,7 @@ export default function User() {
         window.scrollTo(0, 0);
     };
 
-    // Reset form
+
     const resetForm = () => {
         setEditingUser(null);
         setUsername("");
@@ -97,7 +96,7 @@ export default function User() {
         });
     };
 
-    // Delete user
+
     const handleDeleteClick = async (id: number) => {
         if (window.confirm("Are you sure you want to delete this user?")) {
             startTransition(async () => {
@@ -118,7 +117,7 @@ export default function User() {
                 {editingUser ? `Editing User: ${editingUser.username}` : "Add a New User"}
             </h1>
 
-            {/* Form */}
+
             <form
                 onSubmit={handleSubmit}
                 className="w-full flex flex-col md:flex-row flex-wrap items-stretch gap-4 md:gap-6 mb-8"
@@ -190,9 +189,9 @@ export default function User() {
             <hr className="my-6 border-gray-700" />
 
             <div>
-                <h2 className="text-lg md:text-xl font-bold mb-4">Existing Users</h2>
+                <h2 className="text-lg md:text-xl font-bold mb-4">Existing Other Users</h2>
 
-                {users.length > 0 ? (
+                {users.length > 1 ? (
                     <>
                         <div className="block md:hidden space-y-4">
                             {users.map((user) => (
@@ -227,7 +226,7 @@ export default function User() {
                             ))}
                         </div>
 
-                        {/* Desktop View - Table */}
+
                         <div className="hidden md:block overflow-x-auto border rounded-lg">
                             <table className="w-full min-w-[600px] text-left border-collapse">
                                 <thead className="bg-gray-800 text-white sticky top-0">
@@ -269,7 +268,7 @@ export default function User() {
                         </div>
                     </>
                 ) : (
-                    <p>No users found.</p>
+                    <p>No any other users found.</p>
                 )}
             </div>
         </div>

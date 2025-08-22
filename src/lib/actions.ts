@@ -1,4 +1,3 @@
-// lib/actions.ts
 'use server';
 import {cookies} from 'next/headers';
 import {redirect} from 'next/navigation';
@@ -30,7 +29,6 @@ export async function login(prevState: string | undefined, formData: FormData) {
 
         const data = await res.json();
 
-
         if (data.statusCode !== 200) {
             return data.message || 'Login failed. Please check your credentials.';
         }
@@ -42,12 +40,11 @@ export async function login(prevState: string | undefined, formData: FormData) {
 
         (await cookies()).set('session_token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-            expires: new Date(expireDate), // Use the expiry date from the API
+            secure: process.env.NODE_ENV === 'production',
+            expires: new Date(expireDate),
             path: '/',
-            sameSite: 'strict', // Helps prevent CSRF
+            sameSite: 'strict',  // ??
         });
-
 
     } catch (error) {
         if (error instanceof Error) {
@@ -209,7 +206,7 @@ export async function updateUser(prevState: string | undefined, formData: FormDa
         const password = formData.get('password');
         const role = formData.get('role');
 
-        console.log(`Updating user with ID: ${id}, username: ${username}, role: ${role}`);
+        console.log("erfgrtgtr");
 
         const res = await fetch(`http://localhost:8080/api/users/${id}`, {
             method: 'PUT',
@@ -341,7 +338,7 @@ export async function addItems(prevState: string | undefined, formData: FormData
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            // Send the correct item data
+
             body: JSON.stringify({name, description, quantity, price}),
         });
 
