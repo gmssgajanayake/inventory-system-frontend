@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import isUser from "@/lib/actions";
+import isUser, {isAuthenticated} from "@/lib/actions";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
@@ -24,19 +24,27 @@ export default function RootLayout({
     useEffect(() => {
         (async () => {
             const result = await isUser();
+            const isAuther=await isAuthenticated();
 
-            if (result) {
-                setUserRole("USER");
-                setAuthed(true);
-                if (window.location.pathname.includes("/dashboard/user")) {
-                    redirect("/dashboard");
+            if(isAuther){
+                if (result) {
+                    setUserRole("USER");
+                    setAuthed(true);
+                    if (window.location.pathname.includes("/dashboard/user")) {
+                        redirect("/dashboard");
+                    }
+                } else {
+                    setUserRole("ADMIN");
+                    setAuthed(true);
                 }
-            } else {
-                setUserRole("ADMIN");
-                setAuthed(true);
+            }else {
+                setAuthed(false);
+                redirect("/login");
             }
+
         })();
-    }, []);
+    }, [authed]);
+
 
 
     useEffect(() => {
